@@ -22,6 +22,53 @@ public class AuthController : ControllerBase
         _config = config;
     }
 
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var users = await _context.Users
+            .Include(u => u.Teacher)
+            .ToListAsync();
+        return Ok(users);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var user = await _context.Users
+            .Include(u => u.Teacher)
+            .FirstOrDefaultAsync(u => u.Id == id);
+
+        if (user == null) return NotFound();
+        return Ok(user);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, [FromBody] LoginRequest request)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null) return NotFound();
+
+        // Обновляем логин
+        if (!string.IsNullOrEmpty(request.Login))
+        {
+            // Проверяем уникальность логина
+            if (await _context.Users.AnyAsync(u => u.Login == request.Login && u.Id != id))
+                return BadRequest("Логин уже занят");
+
+            user.Login = request.Login;
+        }
+
+        // Обновляем пароль
+        if (!string.IsNullOrEmpty(request.Password))
+        {
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+        }
+
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Пользователь обновлен" });
+    }
+
     public class LoginRequest
     {
         public string Login { get; set; }
