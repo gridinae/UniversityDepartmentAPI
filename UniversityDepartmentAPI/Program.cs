@@ -70,9 +70,10 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.UseRouting();
 app.UseHttpsRedirection();
+app.UseCors("Frontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseCors("Frontend");
 app.Run();
