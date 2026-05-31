@@ -16,11 +16,12 @@ var key = Encoding.ASCII.GetBytes(secretKey);
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("Frontend", policy =>
-        policy
-            .SetIsOriginAllowed(_ => true)
-            .AllowAnyHeader()
-            .AllowAnyMethod());
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
 
 builder.Services.AddAuthentication(options =>
@@ -71,7 +72,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseRouting();
-app.UseCors("Frontend");
+app.UseCors("AllowSpecific");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
