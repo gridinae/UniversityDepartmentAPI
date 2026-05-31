@@ -14,6 +14,12 @@ public class UsersController : ControllerBase
     private readonly AppDbContext _context;
     public UsersController(AppDbContext context) => _context = context;
 
+    public class UpdateUserRequest
+    {
+        public string Login { get; set; }
+        public string Password { get; set; }
+    }
+
     // GET: api/v1/users
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -25,7 +31,6 @@ public class UsersController : ControllerBase
         return Ok(users);
     }
 
-    // PUT: api/v1/users/{id}
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateUserRequest request)
     {
